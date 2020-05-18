@@ -16,27 +16,27 @@ Spark has to be setup by downloading the necessary jar files to get the connecti
 This program makes use of scala with sbt and requires sbt to compile the program for a jar file which can be submitted for a spark job.
 The program when used in spark-submit will then require arguments for it to be used. For example `./spark-submit /home/yy/IntelliJStore/PrototypeOne/target/scala-2.11/prototypeone_2.11-0.1.jar json s3a://spark-test/records.json /home/yy/ToDownload/single/json`
 
-The program mainly does checking of the file type and paths provided for the local filesystem and MinIO, and would execute the spark-job if the arguments given are plausible.
+The program mainly does checking of the file type and paths provided for the local filesystem and MinIO, executing the spark-job if the arguments given are plausible.
 The arguments which can be given upon spark-submit is limited to five in this order, `file type`, `read path`, `write path`, `true/false/CreateBucket`(Optional), `CreateBucket/true/false`(Optional).
 The spark-submit with a local path as the write path is limited to four and the fourth argument is limited to true/false.
 The spark-submit with MinIO as the write path is limited to five and is available to all the optional arguments.
 
-The `true/false` argument given will set the multiline option that can be set for json file type, by default it is set to true.
+The `true/false` argument given will set the multiline option that can be set for the json file type, by default it is set to true.
 The `CreateBucket` argument given will allow a bucket to be created when writing to the Object Store. 
 If given `s3a://bucket123/dir/files` as the write path with `CreateBucket` as an argument, the bucket will be created as `bucket123` if it does not exists.
 
 This program being allowed one read path only does not means that it is limited to reading of one file only, it is able to read all the files with the given extension if specified a directory for the read path.
-`/path/to/dir/*.json` is used to get all the files in a directory under that json extension. 
+`/path/to/dir/*.json` can be used to get all the files in a directory with the json extension. 
 However, inputting `*.filetype` at the end for a local path when doing the spark-submit will result in getting all the available files with that extension under that directory as absolute paths for the arguments. 
 As such, `*.filetype` is appended if the read path given is checked to be a directory. 
 This is not a issue if it is done for the read path of MinIO. `s3a://bucket123/dir/*.filetype` is acceptable and will not gather all the available files as individual paths.
 To counteract this, the spark-job will stop if it checks that the argument given for the write path is a file from the local filesystem or if the argument exceeds 4 in this situation.
 
 Except `avro`, all the filetypes listed can be submitted using spark-job if it meets the minimum argument requirement of `file type`, `read path` and `write path`.
-`avro` file type would require `--packages org.apache.spark:spark-avro_2.11:2.4.5` to be added behind `./spark-submit` for it to be read.
+`avro` file type would require `--packages org.apache.spark:spark-avro_2.11:2.4.5` to be added behind `./spark-submit` for it to be read. `./spark-submit --packages org.apache.spark:spark-avro_2.11:2.4.5 /home/yy/IntelliJStore/PrototypeOne/target/scala-2.11/prototypeone_2.11-0.1.jar avro s3a://spark-test/avrofiles /home/yy/ToDownload/single/avro`
 
 The `custom` file type is a custom datasource, as of now it just maps the data as it is without doing any proccessing on the data for its read and write.
-But it can be seen that proccessing can be added on top of the data for when it is read/written.
+But it can be seen that proccessing can be added on top of the data for when it is read/written as it still makes use of spark to read the data.
 
 ## Setup used
 
@@ -76,15 +76,16 @@ Afterwards, move all the dependency jar files downloaded previously into `/path/
 
 ### IntelliJ IDEA and sbt
 - Download this project using git clone.
-- Download IntelliJ IDEA and sbt.
+- Download [`IntelliJ IDEA`](https://www.jetbrains.com/idea/download/#section=linux) and [`sbt`](https://www.scala-sbt.org/download.html).
 - Use `Open or Import` under IntelliJ idea to open up the downloaded file from git clone.
-- When the file has been loaded fully, cd to the absolute path of this project and enter `sbt package`.
+- When the file has been loaded fully, cd to this project and enter `sbt package`.
 
 A jar file will then appear under target in the project which will be the jar file that is used for spark-submit.
 This jar is referenced in the spark-submit by using the absolute path to it.
 
 ## Running the program
-With that setup all done, go to the bin where spark has been installed `/path/to/spark-2.4.5-bin-hadoop2.7/bin` and try it.
+With that setup all done, go to the bin where spark has been installed `/path/to/spark-2.4.5-bin-hadoop2.7/bin` and try it. 
+Sample data are provided under sampledata file in this project.
 
 Single File Read Write Example:`./spark-submit --class dataSourceReadWrite /home/absolute/path/to/jarfile.jar filetype /path/to/read/from/file.filetype s3a://path/to/write/to/dir`
 
