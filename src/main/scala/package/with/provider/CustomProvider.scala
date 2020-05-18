@@ -1,9 +1,9 @@
 package `package`.`with`.provider
 
 import org.apache.hadoop.fs.Path
+import org.apache.spark.sql.sources._
+import org.apache.spark.sql.types.StructType
 import org.apache.spark.sql.{DataFrame, SQLContext, SaveMode}
-import org.apache.spark.sql.sources.{BaseRelation, CreatableRelationProvider, DataSourceRegister, PrunedFilteredScan, RelationProvider, SchemaRelationProvider}
-import org.apache.spark.sql.types.{StringType, StructField, StructType}
 
 class CustomProvider extends SchemaRelationProvider
   with CreatableRelationProvider
@@ -17,10 +17,19 @@ class CustomProvider extends SchemaRelationProvider
     new CustomRelation(sqlContextS, parametersS("path"), schemaS)
   }
 
-  override def createRelation(sqlContextW: SQLContext, modeW: SaveMode, parametersW: Map[String, String], dataW: DataFrame): BaseRelation = {
+  override def createRelation(sqlContextW: SQLContext, modeW: SaveMode,
+                              parametersW: Map[String, String], dataW: DataFrame): BaseRelation = {
     val path = parametersW("path")
     val fsPath = new Path(path)
     val fs = fsPath.getFileSystem(sqlContextW.sparkContext.hadoopConfiguration)
+
+    val copiedpath = new Path("/home/yy/textFileCopied")
+    try { //if(path.contains("s3a"))
+            fs.copyToLocalFile(fsPath, copiedpath)
+    } catch {
+      case _ : Throwable => println("Could not be copied")
+    }
+
 
     modeW match {
       case SaveMode.Append => sys.error("Append mode is not supported by" + this.getClass.getCanonicalName); sys.exit(1)

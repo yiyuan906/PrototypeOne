@@ -1,9 +1,9 @@
 package `package`.`with`.provider
 
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.{DataFrame, Row, SQLContext, SaveMode}
-import org.apache.spark.sql.sources.{BaseRelation, CreatableRelationProvider, DataSourceRegister, Filter, PrunedFilteredScan, SchemaRelationProvider}
+import org.apache.spark.sql.sources.{BaseRelation, Filter, PrunedFilteredScan}
 import org.apache.spark.sql.types.{StringType, StructField, StructType}
+import org.apache.spark.sql.{Row, SQLContext}
 
 class CustomRelation(sqlContextBack:SQLContext,pathBack:String, schemaBack:StructType)
   extends BaseRelation with PrunedFilteredScan{
