@@ -90,6 +90,14 @@ Single File Read Write Example:`./spark-submit --class dataSourceReadWrite /home
 
 Multiple File Read Write Example:`./spark-submit --class dataSourceReadWrite /home/absolute/path/to/jarfile.jar filetype s3a://path/to/read/from/ /path/to/write/to/dir`
 
+## Additional notes
 
+### Two known issues
+Local filesystem path which ends with `*.filetype` when entered on spark-submit, results in getting multiple paths to files as arguments if there are multiple files with that extension.
+
+Spark write even when using `try catch` cannot catch the exception from main if directory given cannot be created on local filesystem.
+
+### json files
+Incorrect multiline option set might result in incorrect reading of json data. For a single json file case, if the json file is a multiline type, a error might occur when trying to read it if the setting is set to false. In the sample data provided, records.json is the multiline type json file.
 
  
